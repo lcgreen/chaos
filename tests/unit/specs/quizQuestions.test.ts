@@ -33,7 +33,7 @@ describe('Quiz Questions', () => {
         expect(['mild', 'medium', 'extreme']).toContain(question.chaosLevel)
 
         // Check category is valid
-        expect(['Science', 'History', 'Nature', 'Space', 'Human Body']).toContain(question.category)
+        expect(['Science', 'History', 'Nature', 'Space', 'Human Body', 'Food', 'Sport', 'Film', 'Country', 'Animals']).toContain(question.category)
       })
     })
 

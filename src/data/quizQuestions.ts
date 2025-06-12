@@ -57,12 +57,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 2,
     question: "What absolutely mental thing happens to time near a black hole?",
     options: [
-      "Time dilates and slows down dramatically",
       "Time starts running backwards for laughs",
+      "Time dilates and slows down dramatically",
       "Clocks become existentially depressed",
       "Time files a complaint with the universe management"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Science'
   },
@@ -70,12 +70,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 3,
     question: "What's the deal with static electricity shocking you?",
     options: [
-      "Build-up of electrical charge that jumps to balance out",
       "Tiny invisible lightning bolts having a party",
       "Your body is secretly a Tesla coil",
+      "Build-up of electrical charge that jumps to balance out",
       "The universe is testing your pain tolerance"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Science'
   },
@@ -96,12 +96,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 5,
     question: "What's the bonkers deal with quantum entanglement?",
     options: [
-      "Particles remain connected instantly across any distance",
       "Particles are having long-distance relationships",
       "It's just really good particle WiFi",
-      "Subatomic particles invented telepathy before humans"
+      "Subatomic particles invented telepathy before humans",
+      "Particles remain connected instantly across any distance"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Science'
   },
@@ -124,12 +124,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 7,
     question: "What unhinged thing did the ancient Romans use for toothpaste?",
     options: [
-      "Human urine (yes, really)",
       "Crushed diamonds and gold",
+      "Human urine (yes, really)",
       "Whatever the gladiators left behind",
       "Prayers to the tooth gods"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'History'
   },
@@ -137,12 +137,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 8,
     question: "What bizarre thing did ancient Egyptians do with their dead pharaohs?",
     options: [
-      "Removed organs and wrapped them in bandages",
       "Turned them into fancy furniture",
       "Sent them on luxury cruises down the Nile",
+      "Removed organs and wrapped them in bandages",
       "Used them as really expensive bookends"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'History'
   },
@@ -163,12 +163,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 10,
     question: "What absolutely mental military unit did Australia deploy against emus?",
     options: [
-      "Actual soldiers with machine guns (and lost)",
       "A crack team of professional bird whisperers",
       "The Royal Australian Emu Negotiation Squad",
-      "Time-traveling kangaroos"
+      "Time-traveling kangaroos",
+      "Actual soldiers with machine guns (and lost)"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'History'
   },
@@ -191,12 +191,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 12,
     question: "What absolutely mental fact about bananas will ruin your day?",
     options: [
-      "They're radioactive enough to trigger airport sensors",
       "They're plotting the downfall of humanity",
+      "They're radioactive enough to trigger airport sensors",
       "They're actually tiny spaceships",
       "All of the above because nature is having a laugh"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Nature'
   },
@@ -204,12 +204,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 13,
     question: "How do chameleons change color?",
     options: [
-      "Special cells called chromatophores",
       "They're tiny mood rings with legs",
       "Magic (obviously)",
+      "Special cells called chromatophores",
       "They have built-in Instagram filters"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Nature'
   },
@@ -230,12 +230,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 15,
     question: "What mental superpower do mantis shrimp have?",
     options: [
-      "They can see 16 types of color receptors (humans have 3)",
       "They can punch through aquarium glass",
       "They invented underwater kung fu",
-      "They're plotting to overthrow all other sea creatures"
+      "They're plotting to overthrow all other sea creatures",
+      "They can see 16 types of color receptors (humans have 3)"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Nature'
   },
@@ -258,12 +258,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 17,
     question: "What mad thing happens if you fold a piece of paper 42 times?",
     options: [
-      "It becomes thicker than the distance to the Moon",
       "It creates a portal to the paper dimension",
+      "It becomes thicker than the distance to the Moon",
       "It becomes self-aware and starts folding you",
       "The paper files a restraining order"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Space'
   },
@@ -271,12 +271,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 18,
     question: "Why don't we fall off the Earth when it's spinning?",
     options: [
-      "Gravity keeps us stuck to the surface",
       "We're all wearing invisible magnetic boots",
       "The Earth spins slowly enough that we don't notice",
+      "Gravity keeps us stuck to the surface",
       "We do fall off, but we fall back on"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Space'
   },
@@ -297,12 +297,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 20,
     question: "How many possible ways can you arrange a deck of 52 cards?",
     options: [
-      "More than there are atoms in the observable universe",
       "Exactly 42 (the answer to everything)",
       "Infinite, because math gave up counting",
-      "However many ways the cards feel like being arranged"
+      "However many ways the cards feel like being arranged",
+      "More than there are atoms in the observable universe"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Space'
   },
@@ -325,12 +325,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 22,
     question: "What percentage of your DNA do you share with bananas?",
     options: [
-      "About 60% (which explains a lot about humans)",
       "Only 5% (thankfully)",
+      "About 60% (which explains a lot about humans)",
       "85% (you're basically a walking banana)",
       "0% (humans and bananas are sworn enemies)"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Human Body'
   },
@@ -338,12 +338,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 23,
     question: "Why do you get brain freeze from cold drinks?",
     options: [
-      "Blood vessels in your mouth constrict then expand rapidly",
       "Your brain is temporarily turning into ice cream",
+      "Blood vessels in your mouth constrict then expand rapidly",
       "Brain cells are having a cold war",
       "Your skull is trying to become an ice cube"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'medium',
     category: 'Human Body'
   },
@@ -351,12 +351,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 24,
     question: "What percentage of your body weight is just bacteria?",
     options: [
-      "About 1-3% of your total body weight",
       "Roughly 50% (you're mostly microbes)",
       "Only 0.1% (you're pristine)",
+      "About 1-3% of your total body weight",
       "100% (you ARE the bacteria)"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'extreme',
     category: 'Human Body'
   },
@@ -364,12 +364,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 25,
     question: "How many times does your heart beat in an average lifetime?",
     options: [
-      "About 2.5 billion times",
       "Exactly enough to annoy you",
       "It depends on how much coffee you drink",
-      "Your heart stops counting after the first million"
+      "Your heart stops counting after the first million",
+      "About 2.5 billion times"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Human Body'
   },
@@ -392,12 +392,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 27,
     question: "What insane thing happens when you eat spicy food?",
     options: [
-      "Your brain releases endorphins to fight the 'pain'",
       "Your taste buds temporarily gain superpowers",
       "You briefly become part dragon",
+      "Your brain releases endorphins to fight the 'pain'",
       "Your mouth declares war on the rest of your body"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Food'
   },
@@ -405,12 +405,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 28,
     question: "Why does chocolate contain a chemical also found in your brain when you're in love?",
     options: [
-      "It contains phenylethylamine, which triggers similar feelings",
       "Chocolate is literally made of condensed emotions",
+      "It contains phenylethylamine, which triggers similar feelings",
       "Cocoa beans are grown in fields of pure romance",
       "All of the above, chocolate is magic"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Food'
   },
@@ -418,12 +418,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 29,
     question: "What bizarre fact about honey will blow your mind?",
     options: [
-      "It never expires and can last thousands of years",
       "Bees invented the first subscription service",
       "It's actually bee vomit (technically)",
-      "It contains the secret to eternal happiness"
+      "It contains the secret to eternal happiness",
+      "It never expires and can last thousands of years"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Food'
   },
@@ -431,12 +431,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 30,
     question: "Why do Brussels sprouts taste bitter to some people?",
     options: [
-      "Genetic differences in taste receptors",
       "They're naturally grumpy vegetables",
       "Some people have mutant tongues",
+      "Genetic differences in taste receptors",
       "Brussels sprouts choose their victims"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Food'
   },
@@ -459,12 +459,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 32,
     question: "What mental thing happens in 'the zone' during sports?",
     options: [
-      "Athletes enter a flow state where time slows down",
       "They temporarily become one with the equipment",
       "Their brain switches to autopilot mode",
-      "They access the sports dimension"
+      "They access the sports dimension",
+      "Athletes enter a flow state where time slows down"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'medium',
     category: 'Sport'
   },
@@ -472,12 +472,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 33,
     question: "Why do tennis balls lose their bounce over time?",
     options: [
-      "The pressurized gas inside slowly leaks out",
       "They get tired from all the hitting",
+      "The pressurized gas inside slowly leaks out",
       "Tennis balls have existential crises",
       "They're protesting working conditions"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'medium',
     category: 'Sport'
   },
@@ -485,12 +485,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 34,
     question: "What ridiculous origin does the marathon distance have?",
     options: [
-      "It's based on a Greek messenger's route, but changed for London Olympics",
       "Someone just picked a random really long distance",
+      "It's based on a Greek messenger's route, but changed for London Olympics",
       "It was determined by ancient torture methods",
       "Marathon runners are secretly masochists who chose the distance"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Sport'
   },
@@ -498,12 +498,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 35,
     question: "Why do athletes bite their medals?",
     options: [
-      "Historical tradition from testing gold authenticity",
       "Medals taste surprisingly delicious",
       "It's a secret athlete code",
+      "Historical tradition from testing gold authenticity",
       "They're checking if the medal is actually chocolate"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'extreme',
     category: 'Sport'
   },
@@ -526,12 +526,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 37,
     question: "Why do movies use Wilhelm Scream?",
     options: [
-      "It's a famous stock scream used as an inside joke",
       "Wilhelm was the greatest screamer in history",
+      "It's a famous stock scream used as an inside joke",
       "All movie sound comes from one very dramatic man",
       "It's required by law in action movies"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'medium',
     category: 'Film'
   },
@@ -539,12 +539,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 38,
     question: "What crazy technique makes movie explosions look so big?",
     options: [
-      "They use forced perspective and multiple smaller explosions",
       "They actually blow up entire buildings for every movie",
       "CGI has replaced all real explosions",
-      "Movie directors have access to military-grade explosives"
+      "Movie directors have access to military-grade explosives",
+      "They use forced perspective and multiple smaller explosions"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Film'
   },
@@ -552,12 +552,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 39,
     question: "Why don't movie characters ever go to the bathroom?",
     options: [
-      "It breaks narrative flow unless plot-relevant",
       "Movie people don't have bodily functions",
       "Bathroom scenes are banned by the Cinema Council",
+      "It breaks narrative flow unless plot-relevant",
       "All movie characters are actually androids"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'extreme',
     category: 'Film'
   },
@@ -565,12 +565,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 40,
     question: "What makes movie theater popcorn smell so good?",
     options: [
-      "Flavacol seasoning salt with artificial butter flavoring",
       "They pump artificial scents into the theater",
+      "Flavacol seasoning salt with artificial butter flavoring",
       "Movie popcorn is actually made from happiness",
       "It's psychological manipulation to make you hungry"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'medium',
     category: 'Film'
   },
@@ -593,12 +593,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 42,
     question: "What bizarre law exists in Switzerland?",
     options: [
-      "You can't own just one guinea pig (they get lonely)",
       "Yodeling is mandatory on Sundays",
+      "You can't own just one guinea pig (they get lonely)",
       "All chocolate must be blessed by a Swiss monk",
       "Everyone must own at least one cuckoo clock"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Country'
   },
@@ -606,12 +606,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 43,
     question: "Which country is wider than the moon?",
     options: [
-      "Australia (the moon is only 3,474 km wide)",
       "Russia (obviously, it's huge)",
       "Canada (those moose need space)",
-      "The moon is actually tiny, most countries are wider"
+      "The moon is actually tiny, most countries are wider",
+      "Australia (the moon is only 3,474 km wide)"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Country'
   },
@@ -619,12 +619,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 44,
     question: "What country has a national bird that can't fly?",
     options: [
-      "New Zealand (the kiwi)",
       "Antarctica (penguins, if it were a country)",
       "Madagascar (cartoon birds don't count)",
+      "New Zealand (the kiwi)",
       "All birds can fly, this is a trick question"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Country'
   },
@@ -632,12 +632,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 45,
     question: "Which country's national animal is a unicorn?",
     options: [
-      "Scotland (they chose a mythical creature)",
       "England (they're just being fancy)",
+      "Scotland (they chose a mythical creature)",
       "Ireland (leprechauns need transportation)",
       "Unicorns are real, they're just very good at hiding"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'extreme',
     category: 'Country'
   },
@@ -660,12 +660,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 47,
     question: "What superpower do dolphins have?",
     options: [
-      "Echolocation - they see with sound",
       "They can communicate with aliens",
+      "Echolocation - they see with sound",
       "Time travel (only forwards though)",
       "They're plotting to take over the oceans"
     ],
-    correctAnswer: 0,
+    correctAnswer: 1,
     chaosLevel: 'medium',
     category: 'Animals'
   },
@@ -673,12 +673,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 48,
     question: "Why do flamingos stand on one leg?",
     options: [
-      "To conserve body heat",
       "They're practicing yoga",
       "The other leg is on vacation",
+      "To conserve body heat",
       "They're showing off their balance skills"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     chaosLevel: 'medium',
     category: 'Animals'
   },
@@ -699,12 +699,12 @@ export const allQuizQuestions: QuizQuestion[] = [
     id: 50,
     question: "What mental ability do crows have that's scary smart?",
     options: [
-      "They can recognize human faces and hold grudges",
       "They've figured out how to use public transportation",
       "They're building a secret crow society",
-      "They can predict the future (but choose not to tell us)"
+      "They can predict the future (but choose not to tell us)",
+      "They can recognize human faces and hold grudges"
     ],
-    correctAnswer: 0,
+    correctAnswer: 3,
     chaosLevel: 'extreme',
     category: 'Animals'
   }
