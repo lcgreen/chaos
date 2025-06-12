@@ -224,10 +224,10 @@ const initializeSeed = () => {
   return quizSeed.value
 }
 
-// Load questions using the seed and count
-const loadQuestionsWithSeed = (seed: number, count: number = 25) => {
-  questions.value = getSeededQuiz(seed, count)
-  console.log('Questions loaded with seed:', seed, 'count:', count)
+// Load questions using the seed, count, and categories
+const loadQuestionsWithSeed = (seed: number, count: number = 50, categories: string[] = []) => {
+  questions.value = getSeededQuiz(seed, count, categories as any[])
+  console.log('Questions loaded with seed:', seed, 'count:', count, 'categories:', categories)
   console.log('Generated questions:', questions.value.length)
 }
 
@@ -385,20 +385,27 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   console.log('Component mounted, loading questions...')
 
-  // Initialize seed and question count
+  // Initialize seed, question count, and categories
   const seed = initializeSeed()
   const urlCount = route.query.count
-  const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 25
+  const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 50
 
-  // Validate question count (1-25)
-  const validCount = Math.max(1, Math.min(questionCount, 25))
+  // Validate question count (1-50)
+  const validCount = Math.max(1, Math.min(questionCount, 50))
 
-  loadQuestionsWithSeed(seed, validCount)
+  // Parse categories from URL
+  const urlCategories = route.query.categories
+  const categories = urlCategories && typeof urlCategories === 'string'
+    ? urlCategories.split(',').filter(Boolean)
+    : []
+
+  loadQuestionsWithSeed(seed, validCount, categories)
 
   const pageNum = parseInt((route.params.page as string) || '1')
   console.log('Current page:', pageNum)
   console.log('Using seed:', seed)
   console.log('Question count:', validCount)
+  console.log('Categories:', categories)
   console.log('Route params:', route.params)
 
   // Set question index (1-validCount)

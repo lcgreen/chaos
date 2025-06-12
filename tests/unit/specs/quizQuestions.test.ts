@@ -4,7 +4,7 @@ import { quizQuestions, allQuizQuestions, getSeededQuiz, generateSeededQuiz } fr
 describe('Quiz Questions', () => {
   describe('Default seeded quiz', () => {
     it('should generate a valid number of questions', () => {
-      expect(quizQuestions.length).toBe(25) // Default should now generate all 25 questions
+      expect(quizQuestions.length).toBe(50) // Default should now generate all 50 questions
     })
 
     it('should have valid question structure', () => {
@@ -51,8 +51,8 @@ describe('Quiz Questions', () => {
   })
 
   describe('Full question pool', () => {
-    it('should have exactly 25 questions in total', () => {
-      expect(allQuizQuestions).toHaveLength(25)
+    it('should have exactly 50 questions in total', () => {
+      expect(allQuizQuestions).toHaveLength(50)
     })
 
     it('should have all required categories', () => {
@@ -62,6 +62,11 @@ describe('Quiz Questions', () => {
       expect(categories).toContain('Nature')
       expect(categories).toContain('Space')
       expect(categories).toContain('Human Body')
+      expect(categories).toContain('Food')
+      expect(categories).toContain('Sport')
+      expect(categories).toContain('Film')
+      expect(categories).toContain('Country')
+      expect(categories).toContain('Animals')
     })
 
     it('should have all chaos levels represented', () => {
@@ -81,11 +86,11 @@ describe('Quiz Questions', () => {
   describe('Seeded quiz generation', () => {
     it('should generate consistent results with the same seed', () => {
       const seed = 12345
-      const quiz1 = getSeededQuiz(seed, 25)
-      const quiz2 = getSeededQuiz(seed, 25)
+      const quiz1 = getSeededQuiz(seed, 50)
+      const quiz2 = getSeededQuiz(seed, 50)
 
-      expect(quiz1).toHaveLength(25)
-      expect(quiz2).toHaveLength(25)
+      expect(quiz1).toHaveLength(50)
+      expect(quiz2).toHaveLength(50)
 
       // Same seed should produce identical results
       quiz1.forEach((question, index) => {
@@ -95,11 +100,11 @@ describe('Quiz Questions', () => {
     })
 
     it('should generate different results with different seeds', () => {
-      const quiz1 = getSeededQuiz(11111, 25)
-      const quiz2 = getSeededQuiz(22222, 25)
+      const quiz1 = getSeededQuiz(11111, 50)
+      const quiz2 = getSeededQuiz(22222, 50)
 
-      expect(quiz1).toHaveLength(25)
-      expect(quiz2).toHaveLength(25)
+      expect(quiz1).toHaveLength(50)
+      expect(quiz2).toHaveLength(50)
 
       // Different seeds should likely produce different first questions
       const sameFirstQuestion = quiz1[0].id === quiz2[0].id
@@ -116,7 +121,7 @@ describe('Quiz Questions', () => {
 
     it('should not exceed available questions', () => {
       const quiz100 = getSeededQuiz(12345, 100)
-      expect(quiz100.length).toBeLessThanOrEqual(25) // Cannot exceed total available questions
+      expect(quiz100.length).toBeLessThanOrEqual(50) // Cannot exceed total available questions
     })
   })
 

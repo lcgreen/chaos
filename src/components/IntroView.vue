@@ -79,6 +79,22 @@
               @mouseenter="playHoverSound(chaos.chaosLevel)"
             />
 
+            <v-select
+              v-model="selectedCategories"
+              :items="categoryOptions"
+              label="Select Categories (leave empty for all)"
+              variant="outlined"
+              multiple
+              chips
+              :style="{
+                '--v-field-input-color': chaos.currentColors.accent,
+                '--v-field-label-color': chaos.currentColors.secondary
+              }"
+              class="category-select"
+              :class="{ 'beat-bounce': isBeatBouncing }"
+              @mouseenter="playHoverSound(chaos.chaosLevel)"
+            />
+
             <div class="seed-examples">
               <p :style="{ color: chaos.currentColors.secondary }">Quick seeds:</p>
               <div class="example-seeds">
@@ -150,14 +166,16 @@
           </v-card-text>
         </v-card>
 
-        <div class="current-config-display" v-if="currentSeed || selectedQuestionCount !== 25">
+        <div class="current-config-display" v-if="currentSeed || selectedQuestionCount !== 50 || selectedCategories.length > 0">
           <p
             :class="chaos.getTextChaosClass()"
             :style="{ color: chaos.currentColors.accent }"
           >
-            <span v-if="currentSeed">Current Seed: <strong>{{ currentSeed }}</strong></span>
-            <span v-if="currentSeed && selectedQuestionCount !== 25"> • </span>
-            <span v-if="selectedQuestionCount !== 25">Questions: <strong>{{ selectedQuestionCount }}</strong></span>
+            <span v-if="currentSeed">Seed: <strong>{{ currentSeed }}</strong></span>
+            <span v-if="currentSeed && (selectedQuestionCount !== 50 || selectedCategories.length > 0)"> • </span>
+            <span v-if="selectedQuestionCount !== 50">Questions: <strong>{{ selectedQuestionCount }}</strong></span>
+            <span v-if="selectedQuestionCount !== 50 && selectedCategories.length > 0"> • </span>
+            <span v-if="selectedCategories.length > 0">Categories: <strong>{{ selectedCategories.join(', ') }}</strong></span>
           </p>
         </div>
       </div>
@@ -182,7 +200,8 @@ const { playHoverSound, playClickSound, isDrumBeatPlaying } = useAudio()
 // State
 const seedInput = ref<string>('')
 const currentSeed = ref<number | null>(null)
-const selectedQuestionCount = ref<number>(25)
+const selectedQuestionCount = ref<number>(50)
+const selectedCategories = ref<string[]>([])
 
 // Beat tracking for bounce animation
 const isBeatBouncing = ref(false)
@@ -194,7 +213,22 @@ const questionCountOptions = [
   { title: '10 Questions (Medium)', value: 10 },
   { title: '15 Questions (Long)', value: 15 },
   { title: '20 Questions (Extended)', value: 20 },
-  { title: '25 Questions (Full Chaos)', value: 25 }
+  { title: '25 Questions (Classic)', value: 25 },
+  { title: '50 Questions (Full Chaos)', value: 50 }
+]
+
+// Category options
+const categoryOptions = [
+  { title: '🍕 Food', value: 'Food' },
+  { title: '⚽ Sport', value: 'Sport' },
+  { title: '🎬 Film', value: 'Film' },
+  { title: '🌍 Country', value: 'Country' },
+  { title: '🐾 Animals', value: 'Animals' },
+  { title: '🔬 Science', value: 'Science' },
+  { title: '📚 History', value: 'History' },
+  { title: '🌿 Nature', value: 'Nature' },
+  { title: '🚀 Space', value: 'Space' },
+  { title: '🫀 Human Body', value: 'Human Body' }
 ]
 
 // Example seeds for quick selection
@@ -234,13 +268,19 @@ const startQuiz = () => {
 
   playClickSound(chaos.chaosLevel.value)
 
-  // Navigate to first question with seed and question count
+    // Navigate to first question with seed, question count, and categories
+  const queryParams: Record<string, string> = {
+    seed: finalSeed.toString(),
+    count: selectedQuestionCount.value.toString()
+  }
+
+  if (selectedCategories.value.length > 0) {
+    queryParams.categories = selectedCategories.value.join(',')
+  }
+
   router.push({
     path: '/question/1',
-    query: {
-      seed: finalSeed.toString(),
-      count: selectedQuestionCount.value.toString()
-    }
+    query: queryParams
   })
 }
 
@@ -369,6 +409,11 @@ onUnmounted(() => {
 }
 
 .question-count-select {
+  margin-bottom: 1.5rem;
+  transition: transform 0.1s ease-out;
+}
+
+.category-select {
   margin-bottom: 1.5rem;
   transition: transform 0.1s ease-out;
 }
