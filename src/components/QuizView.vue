@@ -377,8 +377,8 @@ onMounted(() => {
   // Set question index (1-validCount)
   if (pageNum >= 1 && pageNum <= quizStore.questions.length) {
     quizStore.goToQuestion(pageNum - 1)
-    // Scale chaos level from 1-10 based on progress through quiz
-    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 10)
+    // Scale chaos level from 1-7 based on progress through quiz (reduced max for readability)
+    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 7)
     setChaosLevel(chaosLevel)
   }
 

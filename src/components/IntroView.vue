@@ -157,7 +157,7 @@
             </h3>
             <ul class="chaos-features" :style="{ color: chaos.currentColors.secondary }">
               <li>🧠 Mind-bending questions across 5 categories</li>
-              <li>📈 Progressive chaos levels (1-10)</li>
+              <li>📈 Progressive chaos levels (1-7)</li>
               <li>🔢 Configurable quiz length (5-25 questions)</li>
               <li>🥁 120 BPM drum beats to keep you on edge</li>
               <li>🎨 Visual effects that escalate with madness</li>
