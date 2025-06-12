@@ -245,9 +245,25 @@ const nextQuestion = () => {
     } else {
       quizCompleted.value = true
       setTimeout(() => {
+        // Pass all quiz parameters to results page so it can regenerate the same quiz
+        const queryParams: Record<string, string> = {
+          answers: JSON.stringify(answers.value)
+        }
+
+        // Include all the parameters used to generate this quiz
+        if (route.query.seed) {
+          queryParams.seed = route.query.seed as string
+        }
+        if (route.query.count) {
+          queryParams.count = route.query.count as string
+        }
+        if (route.query.categories) {
+          queryParams.categories = route.query.categories as string
+        }
+
         router.push({
           path: '/results',
-          query: { answers: JSON.stringify(answers.value) }
+          query: queryParams
         })
       }, 2000)
     }

@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { quizQuestions, type QuizQuestion } from '@/data/quizQuestions'
+import { getSeededQuiz, type QuizQuestion } from '@/data/quizQuestions'
 import { useAudio } from '@/composables/useAudio'
 
 const router = useRouter()
@@ -95,7 +95,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // State
-const questions = ref<QuizQuestion[]>(quizQuestions)
+const questions = ref<QuizQuestion[]>([])
 const userAnswers = ref<number[]>([])
 
 // Computed
@@ -218,6 +218,20 @@ onMounted(() => {
       userAnswers.value = []
     }
   }
+
+  // Regenerate the same quiz that was used in QuizView
+  const seed = route.query.seed ? parseInt(route.query.seed as string) : 12345
+  const count = route.query.count ? parseInt(route.query.count as string) : 50
+  const categoriesParam = route.query.categories
+  const categories = categoriesParam && typeof categoriesParam === 'string'
+    ? categoriesParam.split(',').filter(Boolean)
+    : []
+
+  questions.value = getSeededQuiz(seed, count, categories as any[])
+
+  console.log('Results: Regenerated quiz with seed:', seed, 'count:', count, 'categories:', categories)
+  console.log('Questions loaded:', questions.value.length)
+  console.log('User answers:', userAnswers.value.length)
 })
 </script>
 
