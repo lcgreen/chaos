@@ -247,19 +247,22 @@ const nextQuestion = () => {
       setTimeout(() => {
         // Pass all quiz parameters to results page so it can regenerate the same quiz
         const queryParams: Record<string, string> = {
-          answers: JSON.stringify(answers.value)
+          answers: JSON.stringify(answers.value),
+          seed: quizSeed.value.toString(),
+          count: questions.value.length.toString()
         }
 
-        // Include all the parameters used to generate this quiz
-        if (route.query.seed) {
-          queryParams.seed = route.query.seed as string
+        // Include categories if they were used
+        const urlCategories = route.query.categories
+        const categories = urlCategories && typeof urlCategories === 'string'
+          ? urlCategories.split(',').filter(Boolean)
+          : []
+
+        if (categories.length > 0) {
+          queryParams.categories = categories.join(',')
         }
-        if (route.query.count) {
-          queryParams.count = route.query.count as string
-        }
-        if (route.query.categories) {
-          queryParams.categories = route.query.categories as string
-        }
+
+        console.log('Passing to results - seed:', queryParams.seed, 'count:', queryParams.count, 'categories:', queryParams.categories || 'none')
 
         router.push({
           path: '/results',

@@ -226,7 +226,12 @@ onMounted(() => {
 
   // Regenerate the same quiz that was used in QuizView
   const seed = route.query.seed ? parseInt(route.query.seed as string) : 12345
-  const count = route.query.count ? parseInt(route.query.count as string) : 50
+  const urlCount = route.query.count
+  const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 50
+
+  // Use the same validation logic as QuizView to ensure exact match
+  const count = Math.max(1, Math.min(questionCount, 50))
+
   const categoriesParam = route.query.categories
   const categories = categoriesParam && typeof categoriesParam === 'string'
     ? categoriesParam.split(',').filter(Boolean)
