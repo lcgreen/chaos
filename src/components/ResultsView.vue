@@ -204,7 +204,7 @@ const shouldMirror = () => Math.random() > 0.6
 
 const restartQuiz = () => {
   playClickSound()
-  router.push('/question/1')
+  router.push('/')
 }
 
 onMounted(() => {

@@ -5,6 +5,7 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 
 import App from './App.vue'
+import IntroView from '@/components/IntroView.vue'
 import QuizView from '@/components/QuizView.vue'
 import ResultsView from '@/components/ResultsView.vue'
 
@@ -15,9 +16,9 @@ const vuetify = createVuetify({
 })
 
 const routes = [
-  { path: '/', redirect: '/question/1' },
+  { path: '/', component: IntroView },
   { path: '/question/:page', component: QuizView, props: true },
-  { path: '/results', component: ResultsView, props: route => ({ answers: route.query.answers }) }
+  { path: '/results', component: ResultsView, props: (route: any) => ({ answers: route.query.answers }) }
 ]
 
 const router = createRouter({

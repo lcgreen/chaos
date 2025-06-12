@@ -22,7 +22,7 @@
       </h1>
       <div class="progress-chaos">
         <span class="tiny-text" :style="{ color: chaos.currentColors.accent }">
-          Question {{ currentQuestionIndex + 1 }} of {{ questions.length }} - CHAOS LEVEL {{ chaos.chaosLevel }}
+          Question {{ currentQuestionIndex + 1 }} of {{ questions.length }} - CHAOS LEVEL {{ chaos.chaosLevel }} - SEED: {{ quizSeed }}
         </span>
         <div class="keyboard-hints" :style="{ color: chaos.currentColors.secondary }">
           <span>🎮 ↑↓ navigate • 1-4 select • Enter/→ continue • ← back</span>
@@ -143,7 +143,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { quizQuestions, type QuizQuestion } from '@/data/quizQuestions'
+import { quizQuestions, getSeededQuiz, type QuizQuestion } from '@/data/quizQuestions'
 import { useAudio } from '@/composables/useAudio'
 import { useChaos } from '@/composables/useChaos'
 
@@ -156,11 +156,14 @@ const props = defineProps<Props>()
 const router = useRouter()
 const route = useRoute()
 
-// Initialize chaos system based on current page
+// Initialize chaos system based on current page and total questions
 const currentPage = computed(() => {
   const page = route.params.page
   const pageNum = typeof page === 'string' ? parseInt(page) : 1
-  return Math.max(1, Math.min(pageNum, 10)) // Ensure it's between 1-10
+  const totalQuestions = questions.value.length || 25
+  // Scale chaos level from 1-10 based on progress through quiz
+  const chaosLevel = Math.ceil((pageNum / totalQuestions) * 10)
+  return Math.max(1, Math.min(chaosLevel, 10)) // Ensure it's between 1-10
 })
 
 // Make chaos reactive to page changes
@@ -175,6 +178,9 @@ const currentQuestionIndex = ref(0)
 const selectedAnswer = ref<number | null>(null)
 const answers = ref<number[]>([])
 const quizCompleted = ref(false)
+
+// Seed for consistent randomization
+const quizSeed = ref<number>(12345)
 
 // Beat tracking for bounce animation
 const isBeatBouncing = ref(false)
@@ -200,6 +206,29 @@ const shuffleArray = <T>(array: T[]): T[] => {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
   }
   return shuffled
+}
+
+// Generate or get seed from URL
+const initializeSeed = () => {
+  const urlSeed = route.query.seed
+  if (urlSeed && typeof urlSeed === 'string') {
+    const parsedSeed = parseInt(urlSeed)
+    if (!isNaN(parsedSeed)) {
+      quizSeed.value = parsedSeed
+      return parsedSeed
+    }
+  }
+
+  // Generate a random seed if none provided
+  quizSeed.value = Math.floor(Math.random() * 1000000)
+  return quizSeed.value
+}
+
+// Load questions using the seed and count
+const loadQuestionsWithSeed = (seed: number, count: number = 25) => {
+  questions.value = getSeededQuiz(seed, count)
+  console.log('Questions loaded with seed:', seed, 'count:', count)
+  console.log('Generated questions:', questions.value.length)
 }
 
 // All styling now handled by chaos system
@@ -257,11 +286,13 @@ const stopBeatBounce = () => {
 // Watch for route changes to update question index and chaos level
 watch(() => route.params.page, (newPage) => {
   const pageNum = parseInt((newPage as string) || '1')
+
   if (pageNum >= 1 && pageNum <= questions.value.length && questions.value.length > 0) {
     currentQuestionIndex.value = pageNum - 1
     selectedAnswer.value = null
-    // Update chaos level and audio
-    setChaosLevel(pageNum)
+    // Scale chaos level from 1-10 based on progress through quiz
+    const chaosLevel = Math.ceil((pageNum / questions.value.length) * 10)
+    setChaosLevel(chaosLevel)
   }
 }, { immediate: true })
 
@@ -272,7 +303,9 @@ watch(() => questions.value.length, (newLength) => {
     if (pageNum >= 1 && pageNum <= newLength) {
       currentQuestionIndex.value = pageNum - 1
       selectedAnswer.value = null
-      setChaosLevel(pageNum)
+      // Scale chaos level from 1-10 based on progress through quiz
+      const chaosLevel = Math.ceil((pageNum / newLength) * 10)
+      setChaosLevel(chaosLevel)
     }
   }
 })
@@ -351,16 +384,29 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(() => {
   console.log('Component mounted, loading questions...')
-  questions.value = shuffleArray(quizQuestions)
-  console.log('Questions loaded:', questions.value.length)
-  console.log('Current page:', currentPage.value)
+
+  // Initialize seed and question count
+  const seed = initializeSeed()
+  const urlCount = route.query.count
+  const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 25
+
+  // Validate question count (1-25)
+  const validCount = Math.max(1, Math.min(questionCount, 25))
+
+  loadQuestionsWithSeed(seed, validCount)
+
+  const pageNum = parseInt((route.params.page as string) || '1')
+  console.log('Current page:', pageNum)
+  console.log('Using seed:', seed)
+  console.log('Question count:', validCount)
   console.log('Route params:', route.params)
 
-  // Ensure we set the correct question index
-  const pageNum = parseInt((route.params.page as string) || '1')
+  // Set question index (1-validCount)
   if (pageNum >= 1 && pageNum <= questions.value.length) {
     currentQuestionIndex.value = pageNum - 1
-    setChaosLevel(pageNum)
+    // Scale chaos level from 1-10 based on progress through quiz
+    const chaosLevel = Math.ceil((pageNum / questions.value.length) * 10)
+    setChaosLevel(chaosLevel)
   }
 
   // Add keyboard event listener
