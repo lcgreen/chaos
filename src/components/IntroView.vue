@@ -95,6 +95,20 @@
               @mouseenter="playHoverSound(chaos.chaosLevel)"
             />
 
+            <v-select
+              v-model="maxChaosLevel"
+              :items="chaosLevelOptions"
+              label="Maximum Chaos Level"
+              variant="outlined"
+              :style="{
+                '--v-field-input-color': chaos.currentColors.accent,
+                '--v-field-label-color': chaos.currentColors.secondary
+              }"
+              class="chaos-level-select"
+              :class="{ 'beat-bounce': isBeatBouncing }"
+              @mouseenter="playHoverSound(chaos.chaosLevel)"
+            />
+
             <div class="seed-examples">
               <p :style="{ color: chaos.currentColors.secondary }">Quick seeds:</p>
               <div class="example-seeds">
@@ -156,9 +170,9 @@
               What to Expect:
             </h3>
             <ul class="chaos-features" :style="{ color: chaos.currentColors.secondary }">
-              <li>🧠 Mind-bending questions across 5 categories</li>
-              <li>📈 Progressive chaos levels (1-7)</li>
-              <li>🔢 Configurable quiz length (5-25 questions)</li>
+              <li>🧠 Mind-bending questions across 10 categories</li>
+              <li>📈 Configurable chaos levels (1-10)</li>
+              <li>🔢 Configurable quiz length (5-50 questions)</li>
               <li>🥁 120 BPM drum beats to keep you on edge</li>
               <li>🎨 Visual effects that escalate with madness</li>
               <li>🎯 Consistent results with the same seed</li>
@@ -166,16 +180,18 @@
           </v-card-text>
         </v-card>
 
-        <div class="current-config-display" v-if="currentSeed || selectedQuestionCount !== 50 || selectedCategories.length > 0">
+        <div class="current-config-display" v-if="currentSeed || selectedQuestionCount !== 50 || selectedCategories.length > 0 || maxChaosLevel !== 7">
           <p
             :class="chaos.getTextChaosClass()"
             :style="{ color: chaos.currentColors.accent }"
           >
             <span v-if="currentSeed">Seed: <strong>{{ currentSeed }}</strong></span>
-            <span v-if="currentSeed && (selectedQuestionCount !== 50 || selectedCategories.length > 0)"> • </span>
+            <span v-if="currentSeed && (selectedQuestionCount !== 50 || selectedCategories.length > 0 || maxChaosLevel !== 7)"> • </span>
             <span v-if="selectedQuestionCount !== 50">Questions: <strong>{{ selectedQuestionCount }}</strong></span>
-            <span v-if="selectedQuestionCount !== 50 && selectedCategories.length > 0"> • </span>
+            <span v-if="selectedQuestionCount !== 50 && (selectedCategories.length > 0 || maxChaosLevel !== 7)"> • </span>
             <span v-if="selectedCategories.length > 0">Categories: <strong>{{ selectedCategories.join(', ') }}</strong></span>
+            <span v-if="selectedCategories.length > 0 && maxChaosLevel !== 7"> • </span>
+            <span v-if="maxChaosLevel !== 7">Max Chaos: <strong>{{ maxChaosLevel }}</strong></span>
           </p>
         </div>
       </div>
@@ -204,6 +220,7 @@ const seedInput = ref<string>('')
 const currentSeed = ref<number | null>(null)
 const selectedQuestionCount = ref<number>(50)
 const selectedCategories = ref<string[]>([])
+const maxChaosLevel = ref<number>(7)
 
 // Beat tracking for bounce animation
 const isBeatBouncing = ref(false)
@@ -217,6 +234,20 @@ const questionCountOptions = [
   { title: '20 Questions (Extended)', value: 20 },
   { title: '25 Questions (Classic)', value: 25 },
   { title: '50 Questions (Full Chaos)', value: 50 }
+]
+
+// Chaos level options
+const chaosLevelOptions = [
+  { title: '1 - Peaceful (Minimal chaos)', value: 1 },
+  { title: '2 - Calm (Very low chaos)', value: 2 },
+  { title: '3 - Mild (Low chaos)', value: 3 },
+  { title: '4 - Moderate (Medium-low chaos)', value: 4 },
+  { title: '5 - Active (Medium chaos)', value: 5 },
+  { title: '6 - Intense (Medium-high chaos)', value: 6 },
+  { title: '7 - Wild (High chaos) - Default', value: 7 },
+  { title: '8 - Extreme (Very high chaos)', value: 8 },
+  { title: '9 - Insane (Maximum chaos)', value: 9 },
+  { title: '10 - ABSOLUTE MADNESS (Unreadable)', value: 10 }
 ]
 
 // Category options
@@ -274,10 +305,11 @@ const startQuiz = () => {
   quizStore.resetQuiz()
   quizStore.initializeQuiz(finalSeed, selectedQuestionCount.value, selectedCategories.value)
 
-  // Navigate to first question with seed, question count, and categories
+  // Navigate to first question with seed, question count, categories, and chaos level
   const queryParams: Record<string, string> = {
     seed: finalSeed.toString(),
-    count: selectedQuestionCount.value.toString()
+    count: selectedQuestionCount.value.toString(),
+    maxChaos: maxChaosLevel.value.toString()
   }
 
   if (selectedCategories.value.length > 0) {
