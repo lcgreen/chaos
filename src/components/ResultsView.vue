@@ -46,8 +46,9 @@
               </span>
               <div class="answer-icons">
                 <span v-if="optionIndex === question.correctAnswer">✅</span>
-                <span v-if="userAnswers[index] === optionIndex && optionIndex !== question.correctAnswer">❌</span>
-                <span v-if="userAnswers[index] === optionIndex">👈</span>
+                <span v-if="userAnswers[index] === optionIndex && optionIndex !== question.correctAnswer && userAnswers[index] !== -1">❌</span>
+                <span v-if="userAnswers[index] === optionIndex && userAnswers[index] !== -1">👈</span>
+                <span v-if="userAnswers[index] === -1 && optionIndex === question.correctAnswer">⚠️</span>
               </div>
             </div>
           </div>
@@ -101,7 +102,11 @@ const userAnswers = ref<number[]>([])
 // Computed
 const score = computed(() => {
   return userAnswers.value.reduce((total, answer, index) => {
-    return total + (answer === questions.value[index].correctAnswer ? 1 : 0)
+    // Only count as correct if the answer matches and is not -1 (no answer)
+    if (answer !== -1 && answer === questions.value[index]?.correctAnswer) {
+      return total + 1
+    }
+    return total
   }, 0)
 })
 
@@ -169,7 +174,7 @@ const getAnswerClass = (question: QuizQuestion, optionIndex: number, questionInd
 
   if (optionIndex === question.correctAnswer) {
     return `${baseClass} ${chaosClass} correct-answer`
-  } else if (userAnswers.value[questionIndex] === optionIndex) {
+  } else if (userAnswers.value[questionIndex] === optionIndex && userAnswers.value[questionIndex] !== -1) {
     return `${baseClass} ${chaosClass} user-wrong-answer`
   }
   return `${baseClass} ${chaosClass}`
@@ -232,6 +237,27 @@ onMounted(() => {
   console.log('Results: Regenerated quiz with seed:', seed, 'count:', count, 'categories:', categories)
   console.log('Questions loaded:', questions.value.length)
   console.log('User answers:', userAnswers.value.length)
+
+  // Validate that questions and answers arrays match in length
+  if (questions.value.length !== userAnswers.value.length) {
+    console.warn(`Length mismatch! Questions: ${questions.value.length}, Answers: ${userAnswers.value.length}`)
+
+    // Pad answers array if it's shorter than questions
+    if (userAnswers.value.length < questions.value.length) {
+      const missingAnswers = questions.value.length - userAnswers.value.length
+      console.warn(`Padding ${missingAnswers} missing answers with -1 (no answer)`)
+      userAnswers.value = [...userAnswers.value, ...Array(missingAnswers).fill(-1)]
+    }
+
+    // Trim answers array if it's longer than questions
+    if (userAnswers.value.length > questions.value.length) {
+      const extraAnswers = userAnswers.value.length - questions.value.length
+      console.warn(`Trimming ${extraAnswers} extra answers`)
+      userAnswers.value = userAnswers.value.slice(0, questions.value.length)
+    }
+
+    console.log('After validation - Questions:', questions.value.length, 'Answers:', userAnswers.value.length)
+  }
 })
 </script>
 
@@ -331,6 +357,11 @@ onMounted(() => {
 .user-wrong-answer {
   background: rgba(244, 67, 54, 0.3);
   border-color: #f44336;
+}
+
+.no-answer {
+  background: rgba(255, 193, 7, 0.3);
+  border-color: #ffc107;
 }
 
 .answer-icons {
