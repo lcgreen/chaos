@@ -188,8 +188,10 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAudio } from '@/composables/useAudio'
 import { useChaos } from '@/composables/useChaos'
+import { useQuizStore } from '@/stores/quiz'
 
 const router = useRouter()
+const quizStore = useQuizStore()
 
 // Use chaos level 3 for the intro page (medium chaos)
 const chaos = useChaos(3)
@@ -268,7 +270,11 @@ const startQuiz = () => {
 
   playClickSound(chaos.chaosLevel.value)
 
-    // Navigate to first question with seed, question count, and categories
+  // Initialize the quiz in the store
+  quizStore.resetQuiz()
+  quizStore.initializeQuiz(finalSeed, selectedQuestionCount.value, selectedCategories.value)
+
+  // Navigate to first question with seed, question count, and categories
   const queryParams: Record<string, string> = {
     seed: finalSeed.toString(),
     count: selectedQuestionCount.value.toString()

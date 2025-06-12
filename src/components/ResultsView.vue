@@ -4,7 +4,7 @@
       <h1 class="title spinning-text">🎊 QUIZ RESULTS 🎊</h1>
       <div class="score-chaos">
         <h2 class="score wobbling-text" :style="getScoreStyle()">
-          Score: {{ score }} / {{ questions.length }}
+          Score: {{ score }} / {{ quizStore.questions.length }}
         </h2>
         <p class="percentage pulsing-text" :style="getPercentageStyle()">
           {{ percentage }}% {{ getScoreEmoji() }}
@@ -14,7 +14,7 @@
 
     <div class="questions-review">
       <v-card
-        v-for="(question, index) in questions"
+        v-for="(question, index) in quizStore.questions"
         :key="question.id"
         class="question-review-card"
         :style="getCardStyle(index)"
@@ -46,9 +46,9 @@
               </span>
               <div class="answer-icons">
                 <span v-if="optionIndex === question.correctAnswer">✅</span>
-                <span v-if="userAnswers[index] === optionIndex && optionIndex !== question.correctAnswer && userAnswers[index] !== -1">❌</span>
-                <span v-if="userAnswers[index] === optionIndex && userAnswers[index] !== -1">👈</span>
-                <span v-if="userAnswers[index] === -1 && optionIndex === question.correctAnswer">⚠️</span>
+                <span v-if="quizStore.userAnswers[index] === optionIndex && optionIndex !== question.correctAnswer && quizStore.userAnswers[index] !== -1">❌</span>
+                <span v-if="quizStore.userAnswers[index] === optionIndex && quizStore.userAnswers[index] !== -1">👈</span>
+                <span v-if="quizStore.userAnswers[index] === -1 && optionIndex === question.correctAnswer">⚠️</span>
               </div>
             </div>
           </div>
@@ -80,11 +80,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getSeededQuiz, type QuizQuestion } from '@/data/quizQuestions'
+import { type QuizQuestion } from '@/data/quizQuestions'
+import { useQuizStore } from '@/stores/quiz'
 import { useAudio } from '@/composables/useAudio'
 
 const router = useRouter()
 const route = useRoute()
+const quizStore = useQuizStore()
 
 // Audio composable
 const { playHoverSound, playClickSound } = useAudio()
@@ -95,24 +97,9 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-// State
-const questions = ref<QuizQuestion[]>([])
-const userAnswers = ref<number[]>([])
-
-// Computed
-const score = computed(() => {
-  return userAnswers.value.reduce((total, answer, index) => {
-    // Only count as correct if the answer matches and is not -1 (no answer)
-    if (answer !== -1 && answer === questions.value[index]?.correctAnswer) {
-      return total + 1
-    }
-    return total
-  }, 0)
-})
-
-const percentage = computed(() => {
-  return Math.round((score.value / questions.value.length) * 100)
-})
+// Computed (using store)
+const score = computed(() => quizStore.score)
+const percentage = computed(() => quizStore.percentage)
 
 // Methods
 const getRandomColor = () => {
@@ -174,7 +161,7 @@ const getAnswerClass = (question: QuizQuestion, optionIndex: number, questionInd
 
   if (optionIndex === question.correctAnswer) {
     return `${baseClass} ${chaosClass} correct-answer`
-  } else if (userAnswers.value[questionIndex] === optionIndex && userAnswers.value[questionIndex] !== -1) {
+  } else if (quizStore.userAnswers[questionIndex] === optionIndex && quizStore.userAnswers[questionIndex] !== -1) {
     return `${baseClass} ${chaosClass} user-wrong-answer`
   }
   return `${baseClass} ${chaosClass}`
@@ -216,12 +203,7 @@ onMounted(() => {
   // Parse answers from query params
   const answersParam = route.query.answers || props.answers
   if (answersParam) {
-    try {
-      userAnswers.value = JSON.parse(answersParam as string)
-    } catch (e) {
-      console.error('Failed to parse answers:', e)
-      userAnswers.value = []
-    }
+    quizStore.loadAnswersFromString(answersParam as string)
   }
 
   // Regenerate the same quiz that was used in QuizView
@@ -229,40 +211,19 @@ onMounted(() => {
   const urlCount = route.query.count
   const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 50
 
-  // Use the same validation logic as QuizView to ensure exact match
-  const count = Math.max(1, Math.min(questionCount, 50))
-
   const categoriesParam = route.query.categories
   const categories = categoriesParam && typeof categoriesParam === 'string'
     ? categoriesParam.split(',').filter(Boolean)
     : []
 
-  questions.value = getSeededQuiz(seed, count, categories as any[])
+  quizStore.loadQuizFromParams(seed, questionCount, categories)
 
-  console.log('Results: Regenerated quiz with seed:', seed, 'count:', count, 'categories:', categories)
-  console.log('Questions loaded:', questions.value.length)
-  console.log('User answers:', userAnswers.value.length)
+  console.log('Results: Loaded quiz with store:', quizStore.getQuizParams())
+  console.log('Questions loaded:', quizStore.questions.length)
+  console.log('User answers:', quizStore.userAnswers.length)
 
   // Validate that questions and answers arrays match in length
-  if (questions.value.length !== userAnswers.value.length) {
-    console.warn(`Length mismatch! Questions: ${questions.value.length}, Answers: ${userAnswers.value.length}`)
-
-    // Pad answers array if it's shorter than questions
-    if (userAnswers.value.length < questions.value.length) {
-      const missingAnswers = questions.value.length - userAnswers.value.length
-      console.warn(`Padding ${missingAnswers} missing answers with -1 (no answer)`)
-      userAnswers.value = [...userAnswers.value, ...Array(missingAnswers).fill(-1)]
-    }
-
-    // Trim answers array if it's longer than questions
-    if (userAnswers.value.length > questions.value.length) {
-      const extraAnswers = userAnswers.value.length - questions.value.length
-      console.warn(`Trimming ${extraAnswers} extra answers`)
-      userAnswers.value = userAnswers.value.slice(0, questions.value.length)
-    }
-
-    console.log('After validation - Questions:', questions.value.length, 'Answers:', userAnswers.value.length)
-  }
+  quizStore.validateAnswersLength()
 })
 </script>
 

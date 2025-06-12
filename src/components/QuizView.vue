@@ -22,7 +22,7 @@
       </h1>
       <div class="progress-chaos">
         <span class="tiny-text" :style="{ color: chaos.currentColors.accent }">
-          Question {{ currentQuestionIndex + 1 }} of {{ questions.length }} - CHAOS LEVEL {{ chaos.chaosLevel }} - SEED: {{ quizSeed }}
+          Question {{ quizStore.currentQuestionIndex + 1 }} of {{ quizStore.questions.length }} - CHAOS LEVEL {{ chaos.chaosLevel }} - SEED: {{ quizStore.quizSeed }}
         </span>
         <div class="keyboard-hints" :style="{ color: chaos.currentColors.secondary }">
           <span>🎮 ↑↓ navigate • 1-4 select • Enter/→ continue • ← back</span>
@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <div v-if="!quizCompleted && !currentQuestion" class="loading-chaos">
+    <div v-if="!quizStore.quizCompleted && !quizStore.currentQuestion" class="loading-chaos">
       <h2
         class="loading-title"
             :class="chaos.getTextChaosClass()"
@@ -44,12 +44,12 @@
         🌀 Loading Chaos Level {{ chaos.chaosLevel }}... 🌀
       </h2>
       <p style="color: white; margin-top: 1rem;">
-        Debug: Questions loaded: {{ questions.length }}, Current page: {{ currentPage }}, Current index: {{ currentQuestionIndex }}, Route page: {{ route.params.page }}
+        Debug: Questions loaded: {{ quizStore.questions.length }}, Current page: {{ currentPage }}, Current index: {{ quizStore.currentQuestionIndex }}, Route page: {{ route.params.page }}
       </p>
     </div>
 
     <v-card
-      v-if="!quizCompleted && currentQuestion"
+      v-if="!quizStore.quizCompleted && quizStore.currentQuestion"
       class="question-card chaos-card"
       :style="chaos.getCardChaosStyle()"
     >
@@ -59,7 +59,7 @@
         :style="{ ...chaos.getQuestionChaosStyle(), ...chaos.getTextChaosStyle() }"
       >
         <span
-          v-for="(word, index) in currentQuestion.question.split(' ')"
+          v-for="(word, index) in quizStore.currentQuestion.question.split(' ')"
           :key="index"
           :class="chaos.getTextChaosClass()"
           :style="{
@@ -74,9 +74,9 @@
       </v-card-title>
 
       <v-card-text>
-        <v-radio-group v-model="selectedAnswer" class="options-group">
+        <v-radio-group v-model="quizStore.selectedAnswer" class="options-group">
                     <v-radio
-            v-for="(option, index) in currentQuestion.options"
+            v-for="(option, index) in quizStore.currentQuestion.options"
             :key="index"
             :value="index"
             class="option-radio"
@@ -114,18 +114,18 @@
         <v-btn
           @click="nextQuestion"
           @mouseenter="playHoverSound(chaos.chaosLevel)"
-          :disabled="selectedAnswer === null"
+          :disabled="quizStore.selectedAnswer === null"
           size="large"
           class="chaos-button"
           :class="chaos.getButtonChaosClass()"
           :style="chaos.getButtonChaosStyle()"
         >
-          {{ currentQuestionIndex === questions.length - 1 ? 'FINISH CHAOS' : 'NEXT CHAOS' }}
+          {{ quizStore.isLastQuestion ? 'FINISH CHAOS' : 'NEXT CHAOS' }}
         </v-btn>
       </v-card-actions>
     </v-card>
 
-    <div v-if="quizCompleted" class="completion-chaos">
+    <div v-if="quizStore.quizCompleted" class="completion-chaos">
       <h2
         class="completion-title"
         :class="chaos.getTextChaosClass()"
@@ -143,9 +143,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { quizQuestions, getSeededQuiz, type QuizQuestion } from '@/data/quizQuestions'
+import { type QuizQuestion } from '@/data/quizQuestions'
 import { useAudio } from '@/composables/useAudio'
 import { useChaos } from '@/composables/useChaos'
+import { useQuizStore } from '@/stores/quiz'
 
 // Props
 interface Props {
@@ -155,12 +156,13 @@ const props = defineProps<Props>()
 
 const router = useRouter()
 const route = useRoute()
+const quizStore = useQuizStore()
 
 // Initialize chaos system based on current page and total questions
 const currentPage = computed(() => {
   const page = route.params.page
   const pageNum = typeof page === 'string' ? parseInt(page) : 1
-  const totalQuestions = questions.value.length || 25
+  const totalQuestions = quizStore.questions.length || 25
   // Scale chaos level from 1-10 based on progress through quiz
   const chaosLevel = Math.ceil((pageNum / totalQuestions) * 10)
   return Math.max(1, Math.min(chaosLevel, 10)) // Ensure it's between 1-10
@@ -172,94 +174,45 @@ const chaos = computed(() => useChaos(currentPage.value))
 // Audio composable with chaos level
 const { playHoverSound, playClickSound, setChaosLevel, isDrumBeatPlaying } = useAudio()
 
-// State
-const questions = ref<QuizQuestion[]>([])
-const currentQuestionIndex = ref(0)
-const selectedAnswer = ref<number | null>(null)
-const answers = ref<number[]>([])
-const quizCompleted = ref(false)
-
-// Seed for consistent randomization
-const quizSeed = ref<number>(12345)
-
 // Beat tracking for bounce animation
 const isBeatBouncing = ref(false)
 const beatBounceInterval = ref<number | null>(null)
 
-// Computed
-const currentQuestion = computed(() => {
-  const question = questions.value[currentQuestionIndex.value]
-  console.log('Current question computed:', {
-    questionsLength: questions.value.length,
-    currentIndex: currentQuestionIndex.value,
-    question: question?.question
-  })
-  return question
-})
-const progress = computed(() => ((currentQuestionIndex.value + 1) / questions.value.length) * 100)
+// Computed (using store)
+const progress = computed(() => quizStore.progress)
 
 // Methods
-const shuffleArray = <T>(array: T[]): T[] => {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
+const selectAnswer = (answerIndex: number) => {
+  quizStore.selectAnswer(answerIndex)
+  playHoverSound(chaos.value.chaosLevel.value)
 }
-
-// Generate or get seed from URL
-const initializeSeed = () => {
-  const urlSeed = route.query.seed
-  if (urlSeed && typeof urlSeed === 'string') {
-    const parsedSeed = parseInt(urlSeed)
-    if (!isNaN(parsedSeed)) {
-      quizSeed.value = parsedSeed
-      return parsedSeed
-    }
-  }
-
-  // Generate a random seed if none provided
-  quizSeed.value = Math.floor(Math.random() * 1000000)
-  return quizSeed.value
-}
-
-// Load questions using the seed, count, and categories
-const loadQuestionsWithSeed = (seed: number, count: number = 50, categories: string[] = []) => {
-  questions.value = getSeededQuiz(seed, count, categories as any[])
-  console.log('Questions loaded with seed:', seed, 'count:', count, 'categories:', categories)
-  console.log('Generated questions:', questions.value.length)
-}
-
-// All styling now handled by chaos system
 
 const nextQuestion = () => {
-  if (selectedAnswer.value !== null) {
+  if (quizStore.selectedAnswer !== null) {
     playClickSound(chaos.value.chaosLevel.value)
-    answers.value.push(selectedAnswer.value)
 
-    if (currentQuestionIndex.value < questions.value.length - 1) {
-      const nextPage = currentQuestionIndex.value + 2
+    // Submit the answer to the store
+    quizStore.submitAnswer()
+
+    // Check if quiz is finished
+    const isFinished = quizStore.nextQuestion()
+
+    if (!isFinished) {
+      // Go to next question
+      const nextPage = quizStore.currentQuestionIndex + 1
       router.push(`/question/${nextPage}`)
-      selectedAnswer.value = null
     } else {
-      quizCompleted.value = true
+      // Quiz completed
       setTimeout(() => {
-        // Pass all quiz parameters to results page so it can regenerate the same quiz
+        const params = quizStore.getQuizParams()
         const queryParams: Record<string, string> = {
-          answers: JSON.stringify(answers.value),
-          seed: quizSeed.value.toString(),
-          count: questions.value.length.toString()
+          answers: JSON.stringify(params.answers),
+          seed: params.seed.toString(),
+          count: params.count.toString()
         }
 
-        // Include categories if they were used
-        const urlCategories = route.query.categories
-        const categories = urlCategories && typeof urlCategories === 'string'
-          ? urlCategories.split(',').filter(Boolean)
-          : []
-
-        if (categories.length > 0) {
-          queryParams.categories = categories.join(',')
+        if (params.categories) {
+          queryParams.categories = params.categories.join(',')
         }
 
         console.log('Passing to results - seed:', queryParams.seed, 'count:', queryParams.count, 'categories:', queryParams.categories || 'none')
@@ -306,22 +259,20 @@ const stopBeatBounce = () => {
 watch(() => route.params.page, (newPage) => {
   const pageNum = parseInt((newPage as string) || '1')
 
-  if (pageNum >= 1 && pageNum <= questions.value.length && questions.value.length > 0) {
-    currentQuestionIndex.value = pageNum - 1
-    selectedAnswer.value = null
+  if (pageNum >= 1 && pageNum <= quizStore.questions.length && quizStore.questions.length > 0) {
+    quizStore.goToQuestion(pageNum - 1)
     // Scale chaos level from 1-10 based on progress through quiz
-    const chaosLevel = Math.ceil((pageNum / questions.value.length) * 10)
+    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 10)
     setChaosLevel(chaosLevel)
   }
 }, { immediate: true })
 
 // Also watch for questions to be loaded
-watch(() => questions.value.length, (newLength) => {
+watch(() => quizStore.questions.length, (newLength) => {
   if (newLength > 0) {
     const pageNum = parseInt((route.params.page as string) || '1')
     if (pageNum >= 1 && pageNum <= newLength) {
-      currentQuestionIndex.value = pageNum - 1
-      selectedAnswer.value = null
+      quizStore.goToQuestion(pageNum - 1)
       // Scale chaos level from 1-10 based on progress through quiz
       const chaosLevel = Math.ceil((pageNum / newLength) * 10)
       setChaosLevel(chaosLevel)
@@ -345,44 +296,44 @@ watch(isDrumBeatPlaying, (isPlaying) => {
 
 // Keyboard navigation
 const handleKeydown = (event: KeyboardEvent) => {
-  if (!currentQuestion.value) return
+  if (!quizStore.currentQuestion) return
 
   switch (event.key) {
     case 'ArrowUp':
       event.preventDefault()
-      if (selectedAnswer.value === null) {
-        selectedAnswer.value = 0
-      } else if (selectedAnswer.value > 0) {
-        selectedAnswer.value--
+      if (quizStore.selectedAnswer === null) {
+        quizStore.selectAnswer(0)
+      } else if (quizStore.selectedAnswer > 0) {
+        quizStore.selectAnswer(quizStore.selectedAnswer - 1)
       } else {
-        selectedAnswer.value = currentQuestion.value.options.length - 1
+        quizStore.selectAnswer(quizStore.currentQuestion.options.length - 1)
       }
       playHoverSound(chaos.value.chaosLevel.value)
       break
 
     case 'ArrowDown':
       event.preventDefault()
-      if (selectedAnswer.value === null) {
-        selectedAnswer.value = 0
-      } else if (selectedAnswer.value < currentQuestion.value.options.length - 1) {
-        selectedAnswer.value++
+      if (quizStore.selectedAnswer === null) {
+        quizStore.selectAnswer(0)
+      } else if (quizStore.selectedAnswer < quizStore.currentQuestion.options.length - 1) {
+        quizStore.selectAnswer(quizStore.selectedAnswer + 1)
       } else {
-        selectedAnswer.value = 0
+        quizStore.selectAnswer(0)
       }
       playHoverSound(chaos.value.chaosLevel.value)
       break
 
     case 'ArrowLeft':
       event.preventDefault()
-      if (currentQuestionIndex.value > 0) {
-        router.push(`/question/${currentQuestionIndex.value}`)
+      if (quizStore.currentQuestionIndex > 0) {
+        router.push(`/question/${quizStore.currentQuestionIndex}`)
       }
       break
 
     case 'ArrowRight':
     case 'Enter':
       event.preventDefault()
-      if (selectedAnswer.value !== null) {
+      if (quizStore.selectedAnswer !== null) {
         nextQuestion()
       }
       break
@@ -393,8 +344,8 @@ const handleKeydown = (event: KeyboardEvent) => {
     case '4':
       event.preventDefault()
       const optionIndex = parseInt(event.key) - 1
-      if (optionIndex < currentQuestion.value.options.length) {
-        selectedAnswer.value = optionIndex
+      if (optionIndex < quizStore.currentQuestion.options.length) {
+        quizStore.selectAnswer(optionIndex)
         playHoverSound(chaos.value.chaosLevel.value)
       }
       break
@@ -404,34 +355,30 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   console.log('Component mounted, loading questions...')
 
-  // Initialize seed, question count, and categories
-  const seed = initializeSeed()
+  // Parse parameters from URL
+  const urlSeed = route.query.seed
+  const seed = urlSeed && typeof urlSeed === 'string' ? parseInt(urlSeed) : undefined
+
   const urlCount = route.query.count
   const questionCount = urlCount && typeof urlCount === 'string' ? parseInt(urlCount) : 50
 
-  // Validate question count (1-50)
-  const validCount = Math.max(1, Math.min(questionCount, 50))
-
-  // Parse categories from URL
   const urlCategories = route.query.categories
   const categories = urlCategories && typeof urlCategories === 'string'
     ? urlCategories.split(',').filter(Boolean)
     : []
 
-  loadQuestionsWithSeed(seed, validCount, categories)
+  // Initialize quiz with store
+  quizStore.initializeQuiz(seed, questionCount, categories)
 
   const pageNum = parseInt((route.params.page as string) || '1')
   console.log('Current page:', pageNum)
-  console.log('Using seed:', seed)
-  console.log('Question count:', validCount)
-  console.log('Categories:', categories)
-  console.log('Route params:', route.params)
+  console.log('Quiz initialized with:', quizStore.getQuizParams())
 
   // Set question index (1-validCount)
-  if (pageNum >= 1 && pageNum <= questions.value.length) {
-    currentQuestionIndex.value = pageNum - 1
+  if (pageNum >= 1 && pageNum <= quizStore.questions.length) {
+    quizStore.goToQuestion(pageNum - 1)
     // Scale chaos level from 1-10 based on progress through quiz
-    const chaosLevel = Math.ceil((pageNum / questions.value.length) * 10)
+    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 10)
     setChaosLevel(chaosLevel)
   }
 
