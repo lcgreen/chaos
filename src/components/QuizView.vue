@@ -163,9 +163,9 @@ const currentPage = computed(() => {
   const page = route.params.page
   const pageNum = typeof page === 'string' ? parseInt(page) : 1
   const totalQuestions = quizStore.questions.length || 25
-  // Scale chaos level from 1-10 based on progress through quiz
-  const chaosLevel = Math.ceil((pageNum / totalQuestions) * 10)
-  return Math.max(1, Math.min(chaosLevel, 10)) // Ensure it's between 1-10
+  // Scale chaos level from 1-7 based on progress through quiz (reduced max for readability)
+  const chaosLevel = Math.ceil((pageNum / totalQuestions) * 7)
+  return Math.max(1, Math.min(chaosLevel, 7)) // Ensure it's between 1-7
 })
 
 // Make chaos reactive to page changes
@@ -261,8 +261,8 @@ watch(() => route.params.page, (newPage) => {
 
   if (pageNum >= 1 && pageNum <= quizStore.questions.length && quizStore.questions.length > 0) {
     quizStore.goToQuestion(pageNum - 1)
-    // Scale chaos level from 1-10 based on progress through quiz
-    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 10)
+    // Scale chaos level from 1-7 based on progress through quiz (reduced max for readability)
+    const chaosLevel = Math.ceil((pageNum / quizStore.questions.length) * 7)
     setChaosLevel(chaosLevel)
   }
 }, { immediate: true })
@@ -273,8 +273,8 @@ watch(() => quizStore.questions.length, (newLength) => {
     const pageNum = parseInt((route.params.page as string) || '1')
     if (pageNum >= 1 && pageNum <= newLength) {
       quizStore.goToQuestion(pageNum - 1)
-      // Scale chaos level from 1-10 based on progress through quiz
-      const chaosLevel = Math.ceil((pageNum / newLength) * 10)
+      // Scale chaos level from 1-7 based on progress through quiz (reduced max for readability)
+      const chaosLevel = Math.ceil((pageNum / newLength) * 7)
       setChaosLevel(chaosLevel)
     }
   }
