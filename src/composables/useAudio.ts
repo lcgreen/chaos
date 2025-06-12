@@ -6,6 +6,12 @@ export function useAudio() {
   const isAudioInitialized = ref(false)
   const currentChaosLevel = ref(1)
 
+  // Drum beat state
+  const isDrumBeatPlaying = ref(false)
+  const drumBeatInterval = ref<number | null>(null)
+  const drumBPM = 120 // 120 beats per minute
+  const drumInterval = (60 / drumBPM) * 1000 // Convert to milliseconds
+
   // Chaos level drone configurations - gets progressively more unhinged
   const chaosConfigs = [
     // Level 1: Gentle chaos
@@ -187,10 +193,111 @@ export function useAudio() {
     osc.stop(context.currentTime + 0.05)
   }
 
+  const playDrumKick = (chaosLevel: number = 1) => {
+    if (!audioContext.value) return
+
+    const context = audioContext.value
+
+    // Create the main kick drum oscillator
+    const kickOsc = context.createOscillator()
+    const kickGain = context.createGain()
+    const kickFilter = context.createBiquadFilter()
+
+    // Base frequency for kick drum (around 60-80Hz)
+    const baseFreq = 60 + Math.random() * (20 + chaosLevel * 5)
+    kickOsc.frequency.setValueAtTime(baseFreq * 2, context.currentTime)
+    kickOsc.frequency.exponentialRampToValueAtTime(baseFreq, context.currentTime + 0.1)
+    kickOsc.type = 'sine'
+
+    // Filter for that punchy kick sound
+    kickFilter.type = 'lowpass'
+    kickFilter.frequency.setValueAtTime(300 + chaosLevel * 50, context.currentTime)
+    kickFilter.Q.setValueAtTime(1 + chaosLevel * 0.5, context.currentTime)
+
+    // Volume envelope - quick attack, medium decay
+    const volume = 1.2 + chaosLevel * 0.2
+    kickGain.gain.setValueAtTime(0, context.currentTime)
+    kickGain.gain.linearRampToValueAtTime(volume, context.currentTime + 0.01)
+    kickGain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.2 + chaosLevel * 0.1)
+
+    // Add some noise for texture at higher chaos levels
+    if (chaosLevel > 3) {
+      const noiseBuffer = context.createBuffer(1, context.sampleRate * 0.1, context.sampleRate)
+      const noiseData = noiseBuffer.getChannelData(0)
+      for (let i = 0; i < noiseData.length; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * 0.1
+      }
+
+      const noiseSource = context.createBufferSource()
+      const noiseGain = context.createGain()
+      const noiseFilter = context.createBiquadFilter()
+
+      noiseSource.buffer = noiseBuffer
+      noiseFilter.type = 'highpass'
+      noiseFilter.frequency.setValueAtTime(200, context.currentTime)
+
+      noiseGain.gain.setValueAtTime(0, context.currentTime)
+      noiseGain.gain.linearRampToValueAtTime(0.1 * chaosLevel * 0.02, context.currentTime + 0.005)
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.05)
+
+      noiseSource.connect(noiseFilter)
+      noiseFilter.connect(noiseGain)
+      noiseGain.connect(context.destination)
+
+      noiseSource.start(context.currentTime)
+      noiseSource.stop(context.currentTime + 0.1)
+    }
+
+    // Connect the main kick chain
+    kickOsc.connect(kickFilter)
+    kickFilter.connect(kickGain)
+    kickGain.connect(context.destination)
+
+    // Start and stop the kick
+    kickOsc.start(context.currentTime)
+    kickOsc.stop(context.currentTime + 0.3)
+  }
+
+  const startDrumBeat = (chaosLevel: number = 1) => {
+    if (!audioContext.value || isDrumBeatPlaying.value) return
+
+    isDrumBeatPlaying.value = true
+
+    const playBeat = () => {
+      if (!isDrumBeatPlaying.value) return
+
+      playDrumKick(chaosLevel)
+
+      // At higher chaos levels, add some variation to the timing
+      const variation = chaosLevel > 5 ? Math.random() * 50 - 25 : 0
+      const nextBeatTime = drumInterval + variation
+
+      drumBeatInterval.value = window.setTimeout(playBeat, Math.max(nextBeatTime, 100))
+    }
+
+    // Start the first beat immediately
+    playDrumKick(chaosLevel)
+    // Schedule the next beat
+    drumBeatInterval.value = window.setTimeout(playBeat, drumInterval)
+  }
+
+  const stopDrumBeat = () => {
+    isDrumBeatPlaying.value = false
+    if (drumBeatInterval.value) {
+      clearTimeout(drumBeatInterval.value)
+      drumBeatInterval.value = null
+    }
+  }
+
   const setChaosLevel = (level: number) => {
     currentChaosLevel.value = level
     if (isAudioInitialized.value) {
       createChaoticDroneMusic(level)
+      // Restart drum beat with new chaos level if it was playing
+      if (isDrumBeatPlaying.value) {
+        stopDrumBeat()
+        startDrumBeat(level)
+      }
     }
   }
 
@@ -198,6 +305,7 @@ export function useAudio() {
     const startAudio = () => {
       if (initializeAudio()) {
         createChaoticDroneMusic(currentChaosLevel.value)
+        startDrumBeat(currentChaosLevel.value)
         document.removeEventListener('click', startAudio)
         document.removeEventListener('keydown', startAudio)
         document.removeEventListener('touchstart', startAudio)
@@ -215,6 +323,7 @@ export function useAudio() {
 
   onUnmounted(() => {
     stopDroneMusic()
+    stopDrumBeat()
     if (audioContext.value) {
       audioContext.value.close()
     }
@@ -223,10 +332,14 @@ export function useAudio() {
   return {
     isAudioInitialized,
     currentChaosLevel,
+    isDrumBeatPlaying,
     playHoverSound,
     playClickSound,
+    playDrumKick,
     createChaoticDroneMusic,
     stopDroneMusic,
+    startDrumBeat,
+    stopDrumBeat,
     setChaosLevel
   }
 }

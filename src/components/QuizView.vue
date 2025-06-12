@@ -55,7 +55,7 @@
     >
             <v-card-title
         class="question-title"
-        :class="[chaos.getQuestionChaosClass(), chaos.getTextChaosClass()]"
+        :class="[chaos.getQuestionChaosClass(), chaos.getTextChaosClass(), { 'beat-bounce': isBeatBouncing }]"
         :style="{ ...chaos.getQuestionChaosStyle(), ...chaos.getTextChaosStyle() }"
       >
         <span
@@ -167,7 +167,7 @@ const currentPage = computed(() => {
 const chaos = computed(() => useChaos(currentPage.value))
 
 // Audio composable with chaos level
-const { playHoverSound, playClickSound, setChaosLevel } = useAudio()
+const { playHoverSound, playClickSound, setChaosLevel, isDrumBeatPlaying } = useAudio()
 
 // State
 const questions = ref<QuizQuestion[]>([])
@@ -175,6 +175,10 @@ const currentQuestionIndex = ref(0)
 const selectedAnswer = ref<number | null>(null)
 const answers = ref<number[]>([])
 const quizCompleted = ref(false)
+
+// Beat tracking for bounce animation
+const isBeatBouncing = ref(false)
+const beatBounceInterval = ref<number | null>(null)
 
 // Computed
 const currentQuestion = computed(() => {
@@ -221,6 +225,35 @@ const nextQuestion = () => {
   }
 }
 
+// Beat bounce functionality
+const startBeatBounce = () => {
+  if (beatBounceInterval.value) return
+
+  const drumBPM = 120
+  const beatInterval = (60 / drumBPM) * 1000 // 500ms for 120 BPM
+
+  const bounce = () => {
+    isBeatBouncing.value = true
+    setTimeout(() => {
+      isBeatBouncing.value = false
+    }, 150) // Bounce duration
+  }
+
+  // Start immediately
+  bounce()
+
+  // Continue bouncing
+  beatBounceInterval.value = window.setInterval(bounce, beatInterval)
+}
+
+const stopBeatBounce = () => {
+  if (beatBounceInterval.value) {
+    clearInterval(beatBounceInterval.value)
+    beatBounceInterval.value = null
+  }
+  isBeatBouncing.value = false
+}
+
 // Watch for route changes to update question index and chaos level
 watch(() => route.params.page, (newPage) => {
   const pageNum = parseInt((newPage as string) || '1')
@@ -247,6 +280,15 @@ watch(() => questions.value.length, (newLength) => {
 // Watch for chaos level changes
 watch(() => chaos.value.chaosLevel.value, (newLevel) => {
   setChaosLevel(newLevel)
+})
+
+// Watch for drum beat status to sync bounce animation
+watch(isDrumBeatPlaying, (isPlaying) => {
+  if (isPlaying) {
+    startBeatBounce()
+  } else {
+    stopBeatBounce()
+  }
 })
 
 // Keyboard navigation
@@ -328,6 +370,7 @@ onMounted(() => {
 // Clean up on unmount
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  stopBeatBounce()
 })
 </script>
 
@@ -371,6 +414,12 @@ onUnmounted(() => {
   padding: 2rem;
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  transition: transform 0.1s ease-out;
+}
+
+/* Beat bounce animation - syncs with 120 BPM drum kick */
+.beat-bounce {
+  transform: scale(1.05) translateY(-2px);
 }
 
 .options-group {
